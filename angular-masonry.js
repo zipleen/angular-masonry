@@ -10,6 +10,7 @@
     '$element',
     '$timeout',
     function controller($scope, $element, $timeout) {
+      var masonry;
       var bricks = {};
       var schedule = [];
       var destroyed = false;
@@ -17,6 +18,12 @@
       var timeout = null;
       this.preserveOrder = false;
       this.loadImages = true;
+      this.createMasonry = function(container, options) {
+        if (!$scope.masonry) {
+          $scope.masonry = new Masonry(container, options);
+        }
+        return $scope.masonry;
+      };
       this.scheduleMasonryOnce = function scheduleMasonryOnce() {
         var args = arguments;
         var found = schedule.filter(function filterFn(item) {
@@ -58,7 +65,7 @@
             // Keep track of added elements.
             bricks[id] = true;
             defaultLoaded(element);
-            $element.masonry('appended', element, true);
+            //$scope.masonry.appended(element);
           }
         }
         function _layout() {
@@ -66,16 +73,18 @@
           // that I couldn't fix. If you know how to dynamically add a
           // callback so one could say <masonry loaded="callback($element)">
           // please submit a pull request!
-          self.scheduleMasonryOnce('layout');
+          $scope.masonry.layout();
         }
         if (!self.loadImages) {
           _append();
           _layout();
         } else if (self.preserveOrder) {
           _append();
-          element.imagesLoaded(_layout);
+          imagesLoaded( $element, function() {
+            _layout();
+          });
         } else {
-          element.imagesLoaded(function imagesLoaded() {
+          imagesLoaded( $element, function() {
             _append();
             _layout();
           });
@@ -114,7 +123,7 @@
               itemSelector: attrs.itemSelector || '.masonry-brick',
               columnWidth: parseInt(attrs.columnWidth, 10) || attrs.columnWidth
             }, attrOptions || {});
-          element.masonry(options);
+          ctrl.createMasonry(element[0], options);
           var loadImages = scope.$eval(attrs.loadImages);
           ctrl.loadImages = loadImages !== false;
           var preserveOrder = scope.$eval(attrs.preserveOrder);
