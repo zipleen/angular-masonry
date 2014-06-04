@@ -45,7 +45,8 @@
             return;
           }
           schedule.forEach(function scheduleForEach(args) {
-            $element.masonry.apply($element, args);
+            $scope.masonry.apply($element, args);
+            //$element.masonry.apply($element, args);
           });
           schedule = [];
         }, 30);
@@ -59,7 +60,8 @@
         }
         function _append() {
           if (Object.keys(bricks).length === 0) {
-            $element.masonry('resize');
+            $scope.masonry.resize();
+            //$element.masonry('resize');
           }
           if (bricks[id] === undefined) {
             // Keep track of added elements.
